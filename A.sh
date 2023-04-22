@@ -9,7 +9,7 @@ function getName(){
 function checkRep(){
 while true 
 do
-	getName #declare the tableName variabel
+	getName #declare the tableName variable
 	if test -e $PWD/$tableName
 		then
 			echo "table already exist, try another name"
@@ -22,24 +22,10 @@ do
 done
 }
 
-function fieldCharactristics(){
+function fieldCharactristics() {
 
-
-}
-
-
-function createTable(){
-
-checkRep
-
-echo -n "how many fields in $tableName ?"
-read numOfFields
-
-primeryKey=0
-
-for (( i=1; i<=$numOfFields; i++ ))
+for (( i=1; i<=$1; i++ ))
 do	
-	echo $primeryKey
 	isPrimary="notPrimary"
 	
 	echo -n "what is the name of field $i? " 
@@ -76,10 +62,23 @@ do
    	
    	createField $fieldName $isPrimary $choice
 done
+}
 
 
+function createTable(){
 
-# check that the table doesn't exist
+checkRep
+
+#asking the user for the number of field and store the number in a vriable called "numOfFields"
+echo -n "how many fields in $tableName ?"
+read numOfFields
+
+# assuming that only one field can be a primary key
+#'primeryKey' is turned into one when any field is declared to be a primary key
+# once any primary key is declared, no other key can be declared that is why the question will no longer be asked  
+primeryKey=0
+fieldCharactristics $numOfFields
+
 }
 
 
