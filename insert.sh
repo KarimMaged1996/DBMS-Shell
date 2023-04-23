@@ -44,3 +44,20 @@ isString(){
    fi
 }
 
+
+# function that will check if a value is not repeated in its column in other records
+# it will take three args (col num, value, file path)
+# the function works by grepping the value from its col, if the grep was empty string
+# then the value is unique else it is repeated
+isUnique(){
+  colNum=$1; value=$2; filePath=$3;
+  # the option -v is used to be able to use colNum inside the dollar sign 
+  check=`awk -v c=$colNum 'BEGIN {FS = ":"} FNR > 2 { print $c }' $filePath | grep $value`
+  if [ -z $check ]
+  then 
+     echo true
+  else 
+     echo false
+  fi 
+}
+
