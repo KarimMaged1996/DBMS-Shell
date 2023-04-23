@@ -40,8 +40,26 @@ function checkRep(){
 # once any primary key is declared, no other key can be declared that is why the question will no longer be asked 
 
 function getFieldName() {
+declare -a ARRAY_NAME=()
+fieldNum=1
+while true
+do
 	echo -n "what is the name of field $i? " 
 	read fieldName
+	name=$(cut -d ":" -f $fieldNum $PWD/$tableName | cut -d "," -f 1) 
+	echo $name
+	ARRAY_NAME+=($name)
+	fieldNum+=1
+	echo ${ARRAY_NAME[@]}
+	
+	if [[ " ${ARRAY_NAME[@]} " =~ " ${fieldName} " ]]; then
+	
+		echo "variable is in array"
+	else
+		echo "variable is not in array"
+		break
+	fi
+done 
 }
 
 function primeryOrNot(){
@@ -82,6 +100,7 @@ function createField() {
 	else
 		echo -n "$1,$2,$3" >> $PWD/$tableName
 	fi
+	
 }
 
 
@@ -100,8 +119,6 @@ do
 	
 done
 
-
-checkRep
 
 #asking the user for the number of field and store the number in a vriable called "numOfFields"
 echo -n "how many fields in $tableName ?"
