@@ -33,5 +33,14 @@ isNotEmpty(){
      echo true
   fi
 }
-read x
-isNotEmpty $x
+
+# function that will check if an input is string
+isString(){
+   if [[ $1 =~ ^[a-zA-Z]+$ ]]
+  then 
+      echo true
+   else
+      echo false
+   fi
+}
+
