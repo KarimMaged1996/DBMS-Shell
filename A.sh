@@ -1,18 +1,6 @@
 #!/bin/bash
 
-#get the name of the table from the user 
-function getName(){
-while true 
-do
-	echo -n "what is the name of the table you want to create? "
-	read tableName
-	checkname $tableName
-	if [ $x -eq 1 ]; then
-		break
-	fi
-done
-}
-
+#check that the filename is valid
 function checkname() {
 	
 	if [[ $1 =~ ^[a-zA-Z0-9_]+\.[tT][xX][tT]$ ]]; then
@@ -35,16 +23,24 @@ function checkRep(){
 	fi
 }
 
-# assuming that only one field can be a primary key
-#'primeryKey' is turned into one when any field is declared to be a primary key
-# once any primary key is declared, no other key can be declared that is why the question will no longer be asked 
+function is_number {
+    re='^[0-9]+$'
+    if [[ $1 =~ $re ]] ; then
+        #echo "Number"
+        return 0
+    else
+        echo "number of field must be a number"
+        return 1
+    fi
+}
 
+
+# assuming that only one field can be a primary key
 function getFieldName() {
-#have to be declared outside the function 
 local -n arr=$1
 local fieldNum=$2
-carrier=$fieldNum
-echo ${arr[@]}
+
+echo ${arr[@]}s
 if [ $fieldNum -ne 0 ]; then
 	name=$(cut -d ":" -f $fieldNum $PWD/$tableName | cut -d "," -f 1) 
 	echo $name
@@ -75,8 +71,8 @@ do
 done 
 }
 
-
-
+#'primeryKey' is turned into "1" when any field is declared to be a primary key
+# once any primary key is declared, no other key can be declared that is why the question will no longer be asked 
 function primeryOrNot(){
 	if [ $primeryKey -eq 0 ];
 	then
@@ -99,6 +95,7 @@ function primeryOrNot(){
 	fi
 }
 
+#data type is either a string or a number 
 function dataType() {
 	echo "what is data type of field $i? "
 	select choice in "string" "number" 
@@ -108,7 +105,7 @@ function dataType() {
    	done 
 }
 
-
+# store the field info in the created table following this pattern field1(name,primary,datatype):field2 
 function createField() {
 	if [ $4 -ne $5 ]; then
 		echo -n "$1,$2,$3:" >> $PWD/$tableName
@@ -118,8 +115,10 @@ function createField() {
 }
 
 
+# the main function which enteract with the user and run other functions
 function createTable(){
 
+# keep asking for the file name as long as it's either unvalid or repeated
 while true 
 do
 	echo -n "what is the name of the table you want to create? "
@@ -130,13 +129,19 @@ do
 		touch $PWD/$tableName
 		break
 	fi
-	
 done
 
 
 #asking the user for the number of field and store the number in a vriable called "numOfFields"
-echo -n "how many fields in $tableName ?"
-read numOfFields
+while true
+do
+	echo -n "how many fields in $tableName ?"
+	read numOfFields
+	
+	if is_number $numOfFields ; then
+		break
+	fi
+done 
  
 primeryKey=0
 declare -a ARRAY_NAME=()
@@ -156,8 +161,24 @@ do
 	createField $fieldName $isPrimary $choice $i $numOfFields
 
 done
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -187,15 +208,16 @@ declare -a ARRAY_NAME=()
 ARRAY_NAME+=("amr")
 ARRAY_NAME+=("mariam")
 ARRAY_NAME+=("ahmed")
+
 echo ${ARRAY_NAME[@]}
 
-function printArray() {
+function printArray() 
+{
 	local -n arr=$1
 	arr+=("ali")
 	echo ${arr[@]}
 	
 	echo ${arr[@]}
-	
 }
 
 printArray ARRAY_NAME
