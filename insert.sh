@@ -61,3 +61,12 @@ isUnique(){
   fi 
 }
 
+# this function will check whether a function is null or not
+isNotNull(){
+  if [ $1 == 'null' ]
+  then
+     echo false
+  else
+     echo true
+  fi
+}
