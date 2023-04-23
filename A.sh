@@ -168,13 +168,17 @@ function createTable(){
 		createField $fieldName $isPrimary $choice $i $numOfFields
 	done
 	
+	# adding a line break and adding the heading row with " : " seperating each 
 	echo -e "\n" >> $PWD/$tableName
 	
 	for (( i=1; i<=$numOfFields; i++ ))
-	do
-		echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1)" : " >> $PWD/$tableName
-	
-		
+	do	
+		if [ $i -eq $numOfFields ]; then
+			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1) >> $PWD/$tableName
+		else 
+			
+			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1)" : " >> $PWD/$tableName
+		fi
 	done
 	
 }
