@@ -14,3 +14,13 @@ getConstrains(){
   echo $constrainArr
 }
 
+
+isNumber(){
+   if [[ $1 =~ ^[0-9]+$ ]]
+   then 
+   echo true
+   else
+   echo false
+   fi
+}
+
