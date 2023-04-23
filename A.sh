@@ -26,19 +26,13 @@ function checkname() {
 
 # check if a table with the same name exist in the database 
 function checkRep(){
-while true 
-do
-	getName #declare the tableName variable
-	if test -e $PWD/$tableName ;
+
+	if  [ -f $PWD/$1 ];
 	then
 		echo "table already exist, try another name"
-			
-	else
-		
-		touch $PWD/$tableName
-		break
+		x=0
+		echo $x
 	fi
-done
 }
 
 # assuming that only one field can be a primary key
@@ -81,52 +75,30 @@ function dataType() {
    	done 
 }
 
-function fieldCharactristics() {
-for (( i=1; i<=$1; i++ ))
-do	
-	isPrimary="notPrimary"
-	
-	echo -n "what is the name of field $i? " 
-	read fieldName
-	
-	if [ $primeryKey -eq 0 ];
-	then
-		echo "Is field $i a primary key? "
-		select yesOrNo in "yes" "no"
-		do
-			case $yesOrNo in 
-				"yes" )
-					isPrimary="primaryKey"
-					primeryKey=1
-					break
-				;;
-				
-				"no" )
-					break
-				;;
-			
-			esac
-		done
-		
-	fi
-	
-	echo "what is data type of field $i? "
-	select choice in "string" "number" 
-	do
-		choice=$choice 
-		break
-   	done 
-   	
-   	#append to the file "table"
-   	createField $fieldName $isPrimary $choice
-done
-}
 
 function createField() {
-	echo -n "$1,$2,$3:" >> $PWD/$tableName
+	if [ $4 -ne $5 ]; then
+		echo -n "$1,$2,$3:" >> $PWD/$tableName
+	else
+		echo -n "$1,$2,$3" >> $PWD/$tableName
+	fi
 }
 
+
 function createTable(){
+
+while true 
+do
+	echo -n "what is the name of the table you want to create? "
+	read tableName
+	checkname $tableName
+	checkRep $tableName
+	if [ $x -eq 1 ]; then
+		touch $PWD/$tableName
+		break
+	fi
+	
+done
 
 
 checkRep
@@ -146,14 +118,11 @@ do
 	
 	dataType
 	
-	createField $fieldName $isPrimary $choice
+	createField $fieldName $isPrimary $choice $i $numOfFields
+
 done
 
-
 }
-
-
-
 
 
 createTable 
