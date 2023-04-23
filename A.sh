@@ -40,27 +40,42 @@ function checkRep(){
 # once any primary key is declared, no other key can be declared that is why the question will no longer be asked 
 
 function getFieldName() {
-declare -a ARRAY_NAME=()
-fieldNum=1
-while true
-do
-	echo -n "what is the name of field $i? " 
-	read fieldName
+#have to be declared outside the function 
+local -n arr=$1
+local fieldNum=$2
+carrier=$fieldNum
+echo ${arr[@]}
+if [ $fieldNum -ne 0 ]; then
 	name=$(cut -d ":" -f $fieldNum $PWD/$tableName | cut -d "," -f 1) 
 	echo $name
-	ARRAY_NAME+=($name)
-	fieldNum+=1
-	echo ${ARRAY_NAME[@]}
+	arr+=($name)
+	echo ${arr[@]}
+fi
+
+
+while true
+do	
+	#get names of the created fields
+	echo $fieldNum
 	
-	if [[ " ${ARRAY_NAME[@]} " =~ " ${fieldName} " ]]; then
+	
+	#ask for the name of the new field
+	echo -n "what is the name of field $i? " 
+	read fieldName
+	
+	if [[ " ${arr[@]} " =~ " ${fieldName} " ]]; then
 	
 		echo "variable is in array"
 	else
 		echo "variable is not in array"
 		break
+		
+		
 	fi
 done 
 }
+
+
 
 function primeryOrNot(){
 	if [ $primeryKey -eq 0 ];
@@ -100,7 +115,6 @@ function createField() {
 	else
 		echo -n "$1,$2,$3" >> $PWD/$tableName
 	fi
-	
 }
 
 
@@ -125,10 +139,14 @@ echo -n "how many fields in $tableName ?"
 read numOfFields
  
 primeryKey=0
-
+declare -a ARRAY_NAME=()
+fieldNum=0
 for (( i=1; i<=$numOfFields; i++ ))
 do
-	getFieldName
+
+	getFieldName ARRAY_NAME $fieldNum
+	((fieldNum++))
+	
 	
 	isPrimary="notPrimary"
 	primeryOrNot
@@ -142,4 +160,46 @@ done
 }
 
 
+
+function increment {
+    local my_number=$1
+    ((my_number++))
+    echo $my_number
+    
+}
+
+my_number=42
+increment $my_number
+echo $my_number
+((my_number++))
+echo $my_number # Output: 43
+
+cat new5.txt
+echo "\n"
+name=$(cut -d ":" -f 1 $PWD/new6.txt | cut -d "," -f 1)
+echo $name
+name=$(cut -d ":" -f 2 $PWD/new6.txt | cut -d "," -f 1) 
+echo $name
+name=$(cut -d ":" -f 3 $PWD/new6.txt | cut -d "," -f 1) 
+echo $name
+declare -a ARRAY_NAME=()
+
+ARRAY_NAME+=("amr")
+ARRAY_NAME+=("mariam")
+ARRAY_NAME+=("ahmed")
+echo ${ARRAY_NAME[@]}
+
+function printArray() {
+	local -n arr=$1
+	arr+=("ali")
+	echo ${arr[@]}
+	
+	echo ${arr[@]}
+	
+}
+
+printArray ARRAY_NAME
+echo "----"
+
+echo ${ARRAY_NAME[@]}
 createTable 
