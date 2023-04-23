@@ -14,13 +14,24 @@ getConstrains(){
   echo $constrainArr
 }
 
-
+# function that will check if the user input is a number
 isNumber(){
    if [[ $1 =~ ^[0-9]+$ ]]
-   then 
-   echo true
+  then 
+      echo true
    else
-   echo false
+      echo false
    fi
 }
 
+# function that will check that the input is not empty 
+isNotEmpty(){
+  if [ -z $1 ]
+  then 
+     echo false
+  else 
+     echo true
+  fi
+}
+read x
+isNotEmpty $x
