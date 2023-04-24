@@ -169,7 +169,7 @@ function createTable(){
 	done
 	
 	# adding a line break and adding the heading row with " : " seperating each 
-	echo -e "\n" >> $PWD/$tableName
+	echo -e "" >> $PWD/$tableName
 	
 	for (( i=1; i<=$numOfFields; i++ ))
 	do	
@@ -177,7 +177,7 @@ function createTable(){
 			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1) >> $PWD/$tableName
 		else 
 			
-			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1)" : " >> $PWD/$tableName
+			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1)":" >> $PWD/$tableName
 		fi
 	done
 	
@@ -186,3 +186,6 @@ function createTable(){
 
 
 createTable 
+
+
+

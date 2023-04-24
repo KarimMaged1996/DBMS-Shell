@@ -48,82 +48,7 @@ function is_number {
 	    fi
 }
 
-
-# assuming that only one field can be a primary key
-function getFieldName() {
-	local -n arr=$1
-	local fieldNum=$2
-	#echo ${arr[@]}
-	if [ $fieldNum -ne 0 ]; then
-			name=$(cut -d ":" -f $fieldNum $PWD/$tableName | cut -d "," -f 1) 
-			#echo $name
-			arr+=($name)
-			#echo ${arr[@]}
-	fi
-
-	while true
-	do	
-		#get names of the created fields
-		#echo $fieldNum
-		#ask for the name of the new field
-		echo -n "what is the name of field $i? " 
-		read fieldName
-		
-		if [[ " ${arr[@]} " =~ " ${fieldName} " ]]; then
-		
-			echo "there is a field with the same name"
-		else
-			#echo "variable is not in array"
-			break
-		fi
-	done
-}
-
-
-#'primeryKey' is turned into "1" when any field is declared to be a primary key
-# once any primary key is declared, no other key can be declared that is why the question will no longer be asked 
-function primeryOrNot(){
-	if [ $primeryKey -eq 0 ];
-	then
-		echo "Is field $i a primary key? "
-		select yesOrNo in "yes" "no"
-		do
-			case $yesOrNo in 
-				"yes" )
-					isPrimary="primaryKey"
-					primeryKey=1
-					break
-				;;
-
-				"no" )
-					break
-				;;
-			
-			esac
-		done
-	fi
-}
-
-
-#data type is either a string or a number 
-function dataType() {
-	echo "what is data type of field $i? "
-	select choice in "string" "number" 
-	do
-		choice=$choice 
-		break
-   	done 
-}
-
-
-# store the field info in the created table following this pattern field1(name,primary,datatype):field2 
-function createField() {
-		if [ $4 -ne $5 ]; then
-			echo -n "$1,$2,$3:" >> $PWD/$tableName
-		else
-			echo -n "$1,$2,$3" >> $PWD/$tableName
-		fi
-}
+#choosing which table to be updated
 
 function chooseTable(){
 	while true
@@ -160,7 +85,7 @@ function chooseTable(){
 	echo "<---------------------->"
 }
 
-
+#choose which field to be updated 
 chooseField () {
 	
 	while true
@@ -174,7 +99,7 @@ chooseField () {
 		#numOfFields=$((numOfFields/2))
 		
 		#if the seprator is ":" 
-		numOfFields=$(head -n 3 $PWD/$1 | tail -n 1 | while read LINE; do echo $LINE | grep -o ':' |wc -l; done)
+		numOfFields=$(head -n 2 $PWD/$1 | tail -n 1 | while read LINE; do echo $LINE | grep -o ':' |wc -l; done)
 		numOfFields=$((numOfFields+1))
 		#echo $numOfFields
 		
@@ -182,7 +107,7 @@ chooseField () {
 
 	for (( i=1; i<=$numOfFields; i++ ))
 	do	
-		field=$(head -n 3 $PWD/$1 | tail -n 1 | cut -d":" -f $i )
+		field=$(head -n 2 $PWD/$1 | tail -n 1 | cut -d":" -f $i )
 		#echo $field
 		ARRAY_NAME+=( "$field" )
 		#echo ${ARRAY_NAME[@]}
@@ -206,10 +131,11 @@ chooseField () {
 	done
 }
 
+#getfield properties and get the new value and validate it
 getFieldProp () {
 	
 	#get the field number 
-	fieldNum=$(awk -v var="$1" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2)
+	fieldNum=$(awk -v var="$1" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2)
 	echo "field number is: $fieldNum"
 	
 	#sed -n '3p' $PWD/$2 | grep $1
@@ -220,13 +146,13 @@ getFieldProp () {
 	echo "constrains are $primaryOrNot and $dataType"
 	
 	# store all the field values in array
-	mapfile -t array1 < <(awk -v var="$fieldNum" -F ':' '{if (NR > 3) print $var}' $PWD/$2)
+	mapfile -t array1 < <(awk -v var="$fieldNum" -F ':' '{if (NR > 2) print $var}' $PWD/$2)
 	echo ${array1[@]}
 
 	#get the value 
 	while true
 	do
-		echo -n "$1 = "
+		echo -n "set $1 = "
 		read newValue
 		
 		if [ $primaryOrNot == "primaryKey" ]; then
@@ -254,8 +180,7 @@ getFieldProp () {
 	done 
 }
 
-
-
+#get the condition on which the tabel will be updated 
 getCondition() {
 	
 	echo "what is the condition on which you want to update Ex: name=amr: "
@@ -263,7 +188,7 @@ getCondition() {
 	read condition
 	
 	conditionField=$(echo $condition | cut -d "=" -f 1 )
-	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$1)
+	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$1)
 	conditionValue=$(echo $condition | cut -d "=" -f 2 )
 	
 	#echo $conditionField
@@ -275,13 +200,14 @@ getCondition() {
 
  }
  
+ #check the rows with the conditon and set the value 
  update() {
  	
- 	echo $1
- 	echo $2
- 	echo $3
- 	echo $4
- 	awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 3) if ($CFN == CFV) gsub($FN, NV); print}' $PWD/$5 > new.txt
+ 	#echo $1
+ 	#echo $2
+ 	#echo $3
+ 	#echo $4
+ 	awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN == CFV) gsub($FN, NV); print}' $PWD/$5 > tmp && mv tmp $PWD/$5
  	
  	#print $CFN,$CFV,$FN,$NV}' $PWD/$5
  
