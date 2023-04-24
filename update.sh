@@ -196,11 +196,12 @@ chooseField () {
 
 getFieldProp () {
 	
-	#get the field number
+	#get the field number 
 	echo "prop of $1"
 	x=$1
 	#echo $x
-	awk -v var="$x" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2
+	fieldNum=$(awk -v var="$x" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2)
+	echo $fieldNum
 	#sed -n '3p' $PWD/$2 | grep $1
 
 }
