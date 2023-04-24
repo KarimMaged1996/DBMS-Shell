@@ -26,13 +26,24 @@ function checkExistance(){
 
 
 #check if the number of fields is a number return 0 if true and 1 if false 
+function is_string {
+	    re='^[a-zA-Z_]+$'
+	    if [[ $1 =~ $re ]] ; then
+		#echo "Number"
+		return 0
+	    else
+		echo "this field must be a string"
+		return 1
+	    fi
+}
+
 function is_number {
 	    re='^[0-9]+$'
 	    if [[ $1 =~ $re ]] ; then
 		#echo "Number"
 		return 0
 	    else
-		echo "number of field must be a number"
+		echo "this field must be a number"
 		return 1
 	    fi
 }
@@ -145,7 +156,8 @@ function chooseTable(){
 			continue
 		fi
 	done
-
+	
+	echo "<---------------------->"
 }
 
 
@@ -185,7 +197,7 @@ chooseField () {
 		
 		if [[ " ${ARRAY_NAME[@]} " =~ " ${fieldName} " ]]; then
 			
-			echo $fieldName
+			#echo $fieldName
 			break
 		else
 			continue
@@ -197,15 +209,83 @@ chooseField () {
 getFieldProp () {
 	
 	#get the field number 
-	echo "prop of $1"
-	x=$1
-	#echo $x
-	fieldNum=$(awk -v var="$x" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2)
-	echo $fieldNum
+	fieldNum=$(awk -v var="$1" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2)
+	echo "field number is: $fieldNum"
+	
 	#sed -n '3p' $PWD/$2 | grep $1
+	
+	primaryOrNot=$(head -n 1 $PWD/$2 | cut -d ":" -f $fieldNum | cut -d "," -f 2)
+	dataType=$(head -n 1 $PWD/$2 | cut -d ":" -f $fieldNum | cut -d "," -f 3)
+	
+	echo "constrains are $primaryOrNot and $dataType"
+	
+	# store all the field values in array
+	mapfile -t array1 < <(awk -v var="$fieldNum" -F ':' '{if (NR > 3) print $var}' $PWD/$2)
+	echo ${array1[@]}
 
+	#get the value 
+	while true
+	do
+		echo -n "$1 = "
+		read newValue
+		
+		if [ $primaryOrNot == "primaryKey" ]; then
+			if [[ " ${array1[@]} " =~ " ${newValue} " ]]; then
+				echo "primary key is unique, can't be repeated"
+				continue
+			fi
+			
+			if [ -z "$newValue" ]; then
+				echo "primary key can't be a null value"
+				continue
+			fi
+		fi
+		
+		if [ $dataType == "string" ]; then
+			if is_string $newValue ; then
+				break
+			fi 
+		else
+			if is_number $newValue ; then
+				break
+			fi 
+		fi
+		
+	done 
 }
 
+
+
+getCondition() {
+	
+	echo "what is the condition on which you want to update Ex: name=amr: "
+	echo -n "condition:-"
+	read condition
+	
+	conditionField=$(echo $condition | cut -d "=" -f 1 )
+	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==3 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$1)
+	conditionValue=$(echo $condition | cut -d "=" -f 2 )
+	
+	#echo $conditionField
+	#echo $conditionFieldNum
+	#echo $conditionValue
+	
+	
+	#awk -v var="$conditionField" -i inplace -F ":" '{gsub("World", "Universe"); print}' $PWD/$1
+
+ }
+ 
+ update() {
+ 	
+ 	echo $1
+ 	echo $2
+ 	echo $3
+ 	echo $4
+ 	awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 3) if ($CFN == CFV) gsub($FN, NV); print}' $PWD/$5 > new.txt
+ 	
+ 	#print $CFN,$CFV,$FN,$NV}' $PWD/$5
+ 
+ }
 
 
 
@@ -218,6 +298,10 @@ function updateTable(){
 	
 	getFieldProp $fieldName $tableName
 	
+	getCondition $tableName
+	
+	update $fieldNum $newValue $conditionFieldNum $conditionValue $tableName
+
 }
 
 
