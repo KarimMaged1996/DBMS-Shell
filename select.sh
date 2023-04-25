@@ -58,36 +58,48 @@ selectFromTable(){
   echo "type in the condition the selection based on"
   echo "'example: colName=value', colName>value, colName<value, all"
   read condition
-  if [ $condition == 'all' ]
+  if [ $condition == 'all' ] # if user selects all, all the records will be displayed
   then
-    echo $data 
+    echo $data | column -t -s':' -o'   |   '
+
+  # if the user selects =, data variable is passed to awk to display the first line
+  # then a comparison is made to diplay only records that match a condition
   elif grep -q '=' <<< $condition
   then 
       beforeEqual=`echo $condition | cut -d '=' -f1 `
-      echo $beforeEqual
-      feildNum=`echo $cols | awk  -v l=$noOfCols -v c=$beforeEqual -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
-      echo $feildNum
+      # get the column number based on the data variiable not the file
+      feildNum=`echo $data | head -n +1 | awk  -v l=$noOfCols -v c=$beforeEqual -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
+      
       afterEqual=`echo $condition | cut -d '=' -f2 `
-      echo $data | head -n +1
-      echo $data | awk -F ':' -v n=$feildNum -v v=$afterEqual '{if ($n == v) {print $0}}'
+      
+      finalData=`echo $data | awk -F ':' -v n=$feildNum -v v=$afterEqual '{if (NR ==1 || $n == v) {print $0}}' `
+      echo $finalData | column -t -s':' -o'   |   '
+     
+  # if the user selects =, data variable is passed to awk to display the first line
+  # then a comparison is made to diplay only records that match a condition
   elif grep -q '<' <<< $condition
   then
       beforeEqual=`echo $condition | cut -d '<' -f1 `
-      echo $beforeEqual
-      feildNum=`echo $cols | awk  -v l=$noOfCols -v c=$beforeEqual -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
-      echo $feildNum
+      
+      feildNum=`echo $data | head -n +1 | awk  -v l=$noOfCols -v c=$beforeEqual -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
+      
       afterEqual=`echo $condition | cut -d '<' -f2 `
-      echo $data | head -n +1
-      echo $data | awk -F ':' -v n=$feildNum -v v=$afterEqual '{if ($n < v) {print $0}}'
+    
+      finalData=`echo $data | awk -F ':' -v n=$feildNum -v v=$afterEqual '{if (NR == 1 || $n < v) {print $0}}' `
+      echo $finalData | column -t -s':' -o'   |   '
+  
+  # if the user selects =, data variable is passed to awk to display the first line
+  # then a comparison is made to diplay only records that match a condition
   elif grep -q '>' <<< $condition
   then
       beforeEqual=`echo $condition | cut -d '>' -f1 `
-      echo $beforeEqual
-      feildNum=`echo $cols | awk  -v l=$noOfCols -v c=$beforeEqual -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
-      echo $feildNum
+     
+      feildNum=`echo $data | head -n +1 | awk  -v l=$noOfCols -v c=$beforeEqual -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
+     
       afterEqual=`echo $condition | cut -d '>' -f2 `
-      echo $data | head -n +1
-      echo $data | awk -F ':' -v n=$feildNum -v v=$afterEqual '{if ($n > v) {print $0}}'
+     
+      finalData=`echo $data | awk -F ':' -v n=$feildNum -v v=$afterEqual '{if (NR == 1 || $n > v) {print $0}}' `
+      echo $finalData | column -t -s':' -o'   |   '
   fi 
   
 
