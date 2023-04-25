@@ -230,9 +230,32 @@ function updateTable(){
 
 }
 
+deleteFromTable() {
+	
+	chooseTable
+	
+	echo "what is the condition on which you want to delete the row Ex: name=amr: "
+	echo -n "condition:-"
+	read condition
+	
+	conditionField=$(echo $condition | cut -d "=" -f 1 )
+	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$tableName)
+	conditionValue=$(echo $condition | cut -d "=" -f 2 )
+	
+	echo $conditionFieldNum
+	echo $conditionValue
+	#awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if(NR > 2) if ($CFN == CFV) delete $0; print}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
+	
+	#awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if(NR > 2) if ($CFN == CFV) print $0}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
+	
+	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN != CFV)  print}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
+	
+	
+}
 
+deleteFromTable 
 
-updateTable 
+#updateTable 
 
 
 

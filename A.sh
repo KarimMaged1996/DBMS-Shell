@@ -180,12 +180,27 @@ function createTable(){
 			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1)":" >> $PWD/$tableName
 		fi
 	done
-	
+}
+
+
+listTables() {
+	ls .
+}
+
+
+dropTables() {
+	rm $1
 }
 
 
 
+
 createTable 
+
+
+#listTables
+
+
 
 
 
