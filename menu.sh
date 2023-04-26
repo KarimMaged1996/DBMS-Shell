@@ -1,6 +1,6 @@
 #! /usr/bin/bash
 source A.sh
-#source droptable.sh
+source insert.sh
 
 # function to create the database
 createDatabase() {
@@ -31,7 +31,18 @@ connectToDatabase() {
     	dropTables $1
     	break
     ;;
-    "insert into Table") ;;
+    "insert into Table")
+    echo "which table do you want to insert into"
+    read table
+    echo $1
+    while  [ ! -f $1/$table ];
+    do
+      echo "this table does not exist"
+      read table
+    done
+      insertUI $1/$table
+
+    ;;
     " select from Table") ;;
     " Delete From Table") ;;
     "Update Table") ;;

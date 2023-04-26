@@ -99,7 +99,7 @@ insertUI() {
       done
       if [ $i == 1 ]; then # if it is the first column create a new line
         val+=":"
-        echo $val >>$1
+        echo $val >> $1
       elif [ $i == $noOfCols ]; then # if it is the last column don't append : to val
         sed -i '$s/$/'$val'/' $1
       else
@@ -193,7 +193,7 @@ insertUI() {
   done
 }
 
-insertUI dummy/employee.txt
+# insertUI dummy/employee.txt
 # read val
 # bool=`isNotEmpty $val`
 # while  [ $bool == 'false' ]

@@ -1,0 +1,3 @@
+id,primary,number:firstName,notprimary,string:age,notprimary,number
+id:firstName:age
+1:amr:26

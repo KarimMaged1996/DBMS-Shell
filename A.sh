@@ -197,6 +197,7 @@ function createTable(){
 			echo -n $(cut -d ":" -f $i $path/$tableName | cut -d "," -f 1)":" >> $path/$tableName
 		fi
 	done
+	echo -e "" >> $path/$tableName
 }
 
 
