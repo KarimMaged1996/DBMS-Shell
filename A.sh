@@ -22,6 +22,18 @@ function checkRep(){
 	fi
 }
 
+function checkExistance(){
+	#echo $1
+	#echo $2
+	if  [ -f $1/$2 ]; then
+		return 0
+	else
+		echo "table doesn't exist, try another name"
+		return 1
+	fi
+	
+}
+
 
 #check if the number of fields is a number return 0 if true and 1 if false 
 function is_number {
@@ -189,12 +201,28 @@ function createTable(){
 
 
 listTables() {
-	ls .
+	ls $1
 }
 
-
 dropTables() {
-	rm $1
+        #echo "here"
+        #echo "$1"
+	#path=$1
+	while true
+	do
+		echo "which table do you want to drop ?"
+		read table
+		if checkExistance $1 $table ; then 
+			break 
+		else 
+			echo "this table doesn't exist"
+			continue 
+		fi
+	done
+	
+	
+	rm $1/$table
+	
 }
 
 
