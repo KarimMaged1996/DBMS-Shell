@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#check that the filename is valid
+#check that the filename is valid (txt file)
 function checkname() {
 	
 	if [[ $1 =~ ^[a-zA-Z0-9_]+\.[tT][xX][tT]$ ]]; then
@@ -14,7 +14,7 @@ function checkname() {
 
 # check if a table with the same name exist in the database 
 function checkRep(){
-	if  [ -f $PWD/$1 ]; then
+	if  [ -f $path/$1 ]; then
 		echo "table already exist, try another name"
 		return 1
 	else
@@ -42,7 +42,7 @@ function getFieldName() {
 	local fieldNum=$2
 	#echo ${arr[@]}
 	if [ $fieldNum -ne 0 ]; then
-			name=$(cut -d ":" -f $fieldNum $PWD/$tableName | cut -d "," -f 1) 
+			name=$(cut -d ":" -f $fieldNum $path/$tableName | cut -d "," -f 1) 
 			#echo $name
 			arr+=($name)
 			#echo ${arr[@]}
@@ -77,7 +77,7 @@ function primeryOrNot(){
 		do
 			case $yesOrNo in 
 				"yes" )
-					isPrimary="primaryKey"
+					isPrimary="primary"
 					primeryKey=1
 					break
 				;;
@@ -105,16 +105,20 @@ function dataType() {
 
 # store the field info in the created table following this pattern field1(name,primary,datatype):field2 
 function createField() {
+	#echo $6
 		if [ $4 -ne $5 ]; then
-			echo -n "$1,$2,$3:" >> $PWD/$tableName
+			echo -n "$1,$2,$3:" >> $6/$tableName
 		else
-			echo -n "$1,$2,$3" >> $PWD/$tableName
+			echo -n "$1,$2,$3" >> $6/$tableName
 		fi
 }
 
 
 # the main function which enteract with the user and run other functions
 function createTable(){
+	#cd $1
+	#echo $1
+	path=$1
 	# keep asking for the file name as long as it's either unvalid or repeated
 	while true
 	
@@ -129,7 +133,7 @@ function createTable(){
 		fi
 		
 		if checkRep $tableName ; then
-			touch $PWD/$tableName
+			touch $1/$tableName
 			break
 		else 
 			continue 
@@ -155,29 +159,30 @@ function createTable(){
 	
 	#loopin over the fields to add to the table
 	for (( i=1; i<=$numOfFields; i++ ))
-	do
-		getFieldName ARRAY_NAME $fieldNum
-		
-		((fieldNum++))
-		
-		isPrimary="notPrimary"
-		primeryOrNot
-		
-		dataType
-		
-		createField $fieldName $isPrimary $choice $i $numOfFields
-	done
+		do
+			getFieldName ARRAY_NAME $fieldNum
+			
+			((fieldNum++))
+			
+			isPrimary="notprimary"
+			primeryOrNot
+			
+			dataType
+			
+			
+			createField $fieldName $isPrimary $choice $i $numOfFields $path
+		done
 	
 	# adding a line break and adding the heading row with " : " seperating each 
-	echo -e "" >> $PWD/$tableName
+	echo -e "" >> $path/$tableName
 	
 	for (( i=1; i<=$numOfFields; i++ ))
 	do	
 		if [ $i -eq $numOfFields ]; then
-			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1) >> $PWD/$tableName
+			echo -n $(cut -d ":" -f $i $path/$tableName | cut -d "," -f 1) >> $path/$tableName
 		else 
 			
-			echo -n $(cut -d ":" -f $i $PWD/$tableName | cut -d "," -f 1)":" >> $PWD/$tableName
+			echo -n $(cut -d ":" -f $i $path/$tableName | cut -d "," -f 1)":" >> $path/$tableName
 		fi
 	done
 }
@@ -193,9 +198,9 @@ dropTables() {
 }
 
 
+#path=$PWD/root/DB1
 
-
-createTable 
+#createTable $path
 
 
 #listTables
