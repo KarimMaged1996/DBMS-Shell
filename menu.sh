@@ -1,4 +1,6 @@
 #! /usr/bin/bash
+source A.sh
+#source droptable.sh
 
 # function to create the database
 createDatabase() {
@@ -17,9 +19,18 @@ listDatabases() {
 connectToDatabase() {
   select choice in "Create Table" "List Tables" "Drop Table" "insert into Table" " select from Table" " Delete From Table" "Update Table" "Back to main menu"; do
     case $choice in
-    "Create Table") ;;
-    "List Tables") ;;
-    "Drop Table") ;;
+    "Create Table") 
+ 	createTable $1   
+ 	break
+    ;;
+    "List Tables") 
+    	listTables $1
+    	break
+    ;;
+    "Drop Table") 
+    	dropTables $1
+    	break
+    ;;
     "insert into Table") ;;
     " select from Table") ;;
     " Delete From Table") ;;
