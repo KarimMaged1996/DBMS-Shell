@@ -1,6 +1,7 @@
 #! /usr/bin/bash
 source A.sh
 source insert.sh
+source select.sh
 
 # function to create the database
 createDatabase() {
@@ -34,7 +35,7 @@ connectToDatabase() {
     "insert into Table")
     echo "which table do you want to insert into"
     read table
-    echo $1
+    # echo $1
     while  [ ! -f $1/$table ];
     do
       echo "this table does not exist"
@@ -43,7 +44,17 @@ connectToDatabase() {
       insertUI $1/$table
 
     ;;
-    " select from Table") ;;
+    " select from Table") 
+     echo "which table do you want to select from"
+    read table
+    # echo $1
+    while  [ ! -f $1/$table ];
+    do
+      echo "this table does not exist"
+      read table
+    done
+     selectFromTable $1/$table
+    ;;
     " Delete From Table") ;;
     "Update Table") ;;
     "Back to main menu")
