@@ -2,6 +2,7 @@
 source A.sh
 source insert.sh
 source select.sh
+source update.sh
 
 # function to create the database
 createDatabase() {
@@ -22,15 +23,12 @@ connectToDatabase() {
     case $choice in
     "Create Table") 
  	createTable $1   
- 	break
     ;;
     "List Tables") 
     	listTables $1
-    	break
     ;;
     "Drop Table") 
     	dropTables $1
-    	break
     ;;
     "insert into Table")
     echo "which table do you want to insert into"
@@ -55,8 +53,12 @@ connectToDatabase() {
     done
      selectFromTable $1/$table
     ;;
-    " Delete From Table") ;;
-    "Update Table") ;;
+    " Delete From Table")
+    deleteFromTable $1
+     ;;
+    "Update Table") 
+    updateTable $1
+    ;;
     "Back to main menu")
       menuUI
       ;;

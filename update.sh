@@ -15,7 +15,7 @@ function checkname() {
 # check if a table with the same name exist in the database 
 function checkExistance(){
 	
-	if  [ -f $PWD/$1 ]; then
+	if  [ -f $1 ]; then
 		return 0
 	else
 		echo "table doesn't exist, try another name"
@@ -54,9 +54,9 @@ function chooseTable(){
 	while true
 	
 	do
-		echo "what is the name of the table you want to update? "
+		echo "what is the name of the table you want to modify? "
 		echo "the tabels available in the current database are :-"
-		ls .
+		ls $1
 		echo -n ":"
 		read tableName
 		
@@ -68,13 +68,13 @@ function chooseTable(){
 			continue
 		fi
 		
-		if checkExistance $tableName ; then 
+		if checkExistance $1/$tableName ; then 
 			
 			numOfLines=$(wc -l $tableName | cut -d " " -f 1)
 			#echo $numOfLines
 			numToPrint=$((numOfLines-2))
 			#echo $numToPrint
-			tail -n $numToPrint $PWD/$tableName
+			tail -n $numToPrint $1/$tableName
 			break
 			
 		else
@@ -99,7 +99,7 @@ chooseField () {
 		#numOfFields=$((numOfFields/2))
 		
 		#if the seprator is ":" 
-		numOfFields=$(head -n 2 $PWD/$1 | tail -n 1 | while read LINE; do echo $LINE | grep -o ':' |wc -l; done)
+		numOfFields=$(head -n 2 $1 | tail -n 1 | while read LINE; do echo $LINE | grep -o ':' |wc -l; done)
 		numOfFields=$((numOfFields+1))
 		#echo $numOfFields
 		
@@ -107,7 +107,7 @@ chooseField () {
 
 	for (( i=1; i<=$numOfFields; i++ ))
 	do	
-		field=$(head -n 2 $PWD/$1 | tail -n 1 | cut -d":" -f $i )
+		field=$(head -n 2 $1 | tail -n 1 | cut -d":" -f $i )
 		#echo $field
 		ARRAY_NAME+=( "$field" )
 		#echo ${ARRAY_NAME[@]}
@@ -135,18 +135,18 @@ chooseField () {
 getFieldProp () {
 	
 	#get the field number 
-	fieldNum=$(awk -v var="$1" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$2)
+	fieldNum=$(awk -v var="$1" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $2)
 	echo "field number is: $fieldNum"
 	
 	#sed -n '3p' $PWD/$2 | grep $1
 	
-	primaryOrNot=$(head -n 1 $PWD/$2 | cut -d ":" -f $fieldNum | cut -d "," -f 2)
-	dataType=$(head -n 1 $PWD/$2 | cut -d ":" -f $fieldNum | cut -d "," -f 3)
+	primaryOrNot=$(head -n 1 $2 | cut -d ":" -f $fieldNum | cut -d "," -f 2)
+	dataType=$(head -n 1 $2 | cut -d ":" -f $fieldNum | cut -d "," -f 3)
 	
 	echo "constrains are $primaryOrNot and $dataType"
 	
 	# store all the field values in array
-	mapfile -t array1 < <(awk -v var="$fieldNum" -F ':' '{if (NR > 2) print $var}' $PWD/$2)
+	mapfile -t array1 < <(awk -v var="$fieldNum" -F ':' '{if (NR > 2) print $var}' $2)
 	echo ${array1[@]}
 
 	#get the value 
@@ -188,7 +188,7 @@ getCondition() {
 	read condition
 	
 	conditionField=$(echo $condition | cut -d "=" -f 1 )
-	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$1)
+	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1)
 	conditionValue=$(echo $condition | cut -d "=" -f 2 )
 	
 	#echo $conditionField
@@ -207,7 +207,7 @@ getCondition() {
  	#echo $2
  	#echo $3
  	#echo $4
- 	awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN == CFV) gsub($FN, NV); print}' $PWD/$5 > tmp && mv tmp $PWD/$5
+ 	awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN == CFV) gsub($FN, NV); print}' $5 > tmp && mv tmp $5
  	
  	#print $CFN,$CFV,$FN,$NV}' $PWD/$5
  
@@ -218,42 +218,42 @@ getCondition() {
 # the main function which enteract with the user and run other functions
 function updateTable(){
 	# keep asking for the file name as long as it's either unvalid or repeated
-	chooseTable
+	chooseTable $1
 	
-	chooseField $tableName
+	chooseField $1/$tableName
 	
-	getFieldProp $fieldName $tableName
+	getFieldProp $fieldName $1/$tableName
 	
-	getCondition $tableName
+	getCondition $1/$tableName
 	
-	update $fieldNum $newValue $conditionFieldNum $conditionValue $tableName
+	update $fieldNum $newValue $conditionFieldNum $conditionValue $1/$tableName
 
 }
 
 deleteFromTable() {
 	
-	chooseTable
+	chooseTable $1
 	
 	echo "what is the condition on which you want to delete the row Ex: name=amr: "
 	echo -n "condition:-"
 	read condition
 	
 	conditionField=$(echo $condition | cut -d "=" -f 1 )
-	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $PWD/$tableName)
+	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1/$tableName)
 	conditionValue=$(echo $condition | cut -d "=" -f 2 )
 	
-	echo $conditionFieldNum
-	echo $conditionValue
+	#echo $conditionFieldNum
+	#echo $conditionValue
 	#awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if(NR > 2) if ($CFN == CFV) delete $0; print}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
 	
 	#awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if(NR > 2) if ($CFN == CFV) print $0}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
 	
-	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN != CFV)  print}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
+	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN != CFV)  print}' $1/$tableName > tmp && mv tmp $1/$tableName 
 	
 	
 }
 
-deleteFromTable 
+#deleteFromTable 
 
 #updateTable 
 
