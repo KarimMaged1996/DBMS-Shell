@@ -1,4 +1,4 @@
-primary,int:string:int
+id,primary,number:name,notprimary,string:age,notprimary,number
 id:name:age
 01:amr:25
 02:karim:27
