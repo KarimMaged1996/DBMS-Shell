@@ -1,2 +1,0 @@
-id,primaryKey,number:name,notPrimary,string:age,notPrimary,number
-id:name:age

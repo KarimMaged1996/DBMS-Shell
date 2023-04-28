@@ -65,7 +65,7 @@ function getFieldName() {
 		#get names of the created fields
 		#echo $fieldNum
 		#ask for the name of the new field
-		echo -n "what is the name of field $i? " 
+		echo -n "what is the name of field $3? " 
 		read fieldName
 		
 		if [[ " ${arr[@]} " =~ " ${fieldName} " ]]; then
@@ -172,11 +172,12 @@ function createTable(){
 	#loopin over the fields to add to the table
 	for (( i=1; i<=$numOfFields; i++ ))
 		do
-			getFieldName ARRAY_NAME $fieldNum
+			getFieldName ARRAY_NAME $fieldNum $i
 			
 			((fieldNum++))
 			
 			isPrimary="notprimary"
+			
 			primeryOrNot
 			
 			dataType
@@ -213,7 +214,7 @@ dropTables() {
 	do
 		echo "which table do you want to drop ?"
 		read table
-		if checkExistance $1 $table ; then 
+		if checkExistance $1/$table ; then 
 			break 
 		else 
 			echo "this table doesn't exist"

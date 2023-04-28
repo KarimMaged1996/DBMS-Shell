@@ -1,5 +1,5 @@
 #! /usr/bin/bash
-source A.sh
+source create.sh
 source insert.sh
 source select.sh
 source update.sh
