@@ -54,7 +54,7 @@ function chooseTable(){
 	while true
 	
 	do
-		echo "what is the name of the table you want to modify? "
+		echo "what is the name of the table you want to update/delete? "
 		echo "the tabels available in the current database are :-"
 		ls $1
 		echo -n ":"
@@ -70,9 +70,9 @@ function chooseTable(){
 		
 		if checkExistance $1/$tableName ; then 
 			
-			numOfLines=$(wc -l $tableName | cut -d " " -f 1)
+			numOfLines=$(wc -l $1/$tableName | cut -d " " -f 1)
 			#echo $numOfLines
-			numToPrint=$((numOfLines-2))
+			numToPrint=$((numOfLines-1))
 			#echo $numToPrint
 			tail -n $numToPrint $1/$tableName
 			break
@@ -183,18 +183,33 @@ getFieldProp () {
 #get the condition on which the tabel will be updated 
 getCondition() {
 	
-	echo "what is the condition on which you want to update Ex: name=amr: "
+	echo "what is the condition on which you want to update/delete Ex: name=amr : "
 	echo -n "condition:-"
 	read condition
 	
-	conditionField=$(echo $condition | cut -d "=" -f 1 )
-	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1)
-	conditionValue=$(echo $condition | cut -d "=" -f 2 )
+	sign1="="
+	if [[ "$condition" == *"$sign1"* ]]; then
+		conditionField=$(echo $condition | cut -d "=" -f 1 )
+		conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1)
+		conditionValue=$(echo $condition | cut -d "=" -f 2 )
+	fi
 	
+	sign2='>'
+	if [[ "$condition" == *"$sign2"* ]]; then
+		conditionField=$(echo $condition | cut -d ">" -f 1 )
+		conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1)
+		conditionValue=$(echo $condition | cut -d ">" -f 2 )
+	fi
+	
+	sign2='<'
+	if [[ "$condition" == *"$sign2"* ]]; then
+		conditionField=$(echo $condition | cut -d "<" -f 1 )
+		conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1)
+		conditionValue=$(echo $condition | cut -d "<" -f 2 )
+	fi
 	#echo $conditionField
 	#echo $conditionFieldNum
 	#echo $conditionValue
-	
 	
 	#awk -v var="$conditionField" -i inplace -F ":" '{gsub("World", "Universe"); print}' $PWD/$1
 
@@ -203,14 +218,26 @@ getCondition() {
  #check the rows with the conditon and set the value 
  update() {
  	
+ 	sign1="="
+ 	if [[ "$condition" == *"$sign1"* ]]; then
+ 		awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN == CFV) gsub($FN, NV); print}' $5 > tmp && mv tmp $5
+ 	fi
+ 	
+ 	sign2='>'
+ 	if [[ "$condition" == *"$sign2"* ]]; then
+ 		awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN > CFV) gsub($FN, NV); print}' $5 > tmp && mv tmp $5
+ 	fi
+ 	
+ 	sign3='<'
+ 	if [[ "$condition" == *"$sign2"* ]]; then
+ 		awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN < CFV) gsub($FN, NV); print}' $5 > tmp && mv tmp $5
+ 	fi
  	#echo $1
  	#echo $2
  	#echo $3
  	#echo $4
- 	awk -v FN="$1" -v NV="$2" -v CFN="$3" -v CFV="$4" -F ":" '{if(NR > 2) if ($CFN == CFV) gsub($FN, NV); print}' $5 > tmp && mv tmp $5
  	
  	#print $CFN,$CFV,$FN,$NV}' $PWD/$5
- 
  }
 
 
@@ -218,6 +245,9 @@ getCondition() {
 # the main function which enteract with the user and run other functions
 function updateTable(){
 	# keep asking for the file name as long as it's either unvalid or repeated
+	
+	echo "updating"
+	
 	chooseTable $1
 	
 	chooseField $1/$tableName
@@ -230,17 +260,25 @@ function updateTable(){
 
 }
 
-deleteFromTable() {
+
+
+
+
+
+function deleteFromTable() {
 	
+	echo "Deleting"	
 	chooseTable $1
 	
-	echo "what is the condition on which you want to delete the row Ex: name=amr: "
-	echo -n "condition:-"
-	read condition
+	#echo "what is the condition on which you want to delete the row Ex: name=amr: "
+	#echo -n "condition:-"
+	#read condition
 	
-	conditionField=$(echo $condition | cut -d "=" -f 1 )
-	conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1/$tableName)
-	conditionValue=$(echo $condition | cut -d "=" -f 2 )
+	getCondition $1/$tableName
+	
+	#conditionField=$(echo $condition | cut -d "=" -f 1 )
+	#conditionFieldNum=$(awk -v var="$conditionField" -F ':' 'NR==2 { for (i=1; i<=NF; i++) if ($i == var) print i}' $1/$tableName)
+	#conditionValue=$(echo $condition | cut -d "=" -f 2 )
 	
 	#echo $conditionFieldNum
 	#echo $conditionValue
@@ -248,9 +286,21 @@ deleteFromTable() {
 	
 	#awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if(NR > 2) if ($CFN == CFV) print $0}' $PWD/$tableName > tmp && mv tmp $PWD/$tableName 
 	
-	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN != CFV)  print}' $1/$tableName > tmp && mv tmp $1/$tableName 
+	sign1="="
+ 	if [[ "$condition" == *"$sign1"* ]]; then
+	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN != CFV || NR < 3)  print}' $1/$tableName > tmp && mv tmp $1/$tableName 
+	fi
 	
+	sign2='>'
+ 	if [[ "$condition" == *"$sign2"* ]]; then
+	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN <= CFV || NR < 3)  print}' $1/$tableName > tmp && mv tmp $1/$tableName 
+	fi
 	
+	sign3='<'
+ 	if [[ "$condition" == *"$sign3"* ]]; then
+ 	awk -v CFN="$conditionFieldNum" -v CFV="$conditionValue" -F ":" '{if($CFN >= CFV || NR < 3)  print}' $1/$tableName > tmp && mv tmp $1/$tableName 
+ 	fi
+
 }
 
 #deleteFromTable 
