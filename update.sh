@@ -48,8 +48,29 @@ function is_number {
 	    fi
 }
 
-#choosing which table to be updated
+function primeryOrNot(){
+	if [ $primeryKey -eq 0 ];
+	then
+		echo "Is field $i a primary key? "
+		select yesOrNo in "yes" "no"
+		do
+			case $yesOrNo in 
+				"yes" )
+					isPrimary="primary"
+					primeryKey=1
+					break
+				;;
 
+				"no" )
+					break
+				;;
+			
+			esac
+		done
+	fi
+}
+
+#choosing which table to be updated
 function chooseTable(){
 	while true
 	
@@ -155,7 +176,7 @@ getFieldProp () {
 		echo -n "set $1 = "
 		read newValue
 		
-		if [ $primaryOrNot == "primaryKey" ]; then
+		if [ $primaryOrNot == "primary" ]; then
 			if [[ " ${array1[@]} " =~ " ${newValue} " ]]; then
 				echo "primary key is unique, can't be repeated"
 				continue
