@@ -1,0 +1,9 @@
+id,primary,number:name,notprimary,string:age,notprimary,number:profession,notprimary,string
+id:name:age:profession
+1:karim:27:engineer
+2:amr:25:engineer
+3:mahmoud:30:accountant
+4:ahmed:15:student
+5:farah:26:architect
+6:salma:22:lawyer
+7:adbulrahman:50:teacher

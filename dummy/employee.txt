@@ -1,5 +1,0 @@
-primary,int:string:int
-id:name:age
-01:amr:25
-02:karim:27
-03:mahmoud:23

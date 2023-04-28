@@ -1,0 +1,2 @@
+id,primary,string:name,notprimary,string:age,notprimary,number
+id:name:age
