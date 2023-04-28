@@ -3,7 +3,7 @@
 #check that the filename is valid
 function checkname() {
 	
-	if [[ $1 =~ ^[a-zA-Z0-9_]+\.[tT][xX][tT]$ ]]; then
+	if [[ $1 =~ ^[a-zA-Z0-9_]+ ]]; then
 		return 0 
 	else
 		echo "File name is invalid."
@@ -168,7 +168,7 @@ getFieldProp () {
 	
 	# store all the field values in array
 	mapfile -t array1 < <(awk -v var="$fieldNum" -F ':' '{if (NR > 2) print $var}' $2)
-	echo ${array1[@]}
+	#echo ${array1[@]}
 
 	#get the value 
 	while true

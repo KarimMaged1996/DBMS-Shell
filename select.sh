@@ -46,7 +46,7 @@ selectFromTable(){
   for col in $colsToSelect
   do
     num=`echo $cols | awk  -v l=$noOfCols -v c=$col -F ":" '{for (i=1;i<=l;i++) if ($i == c ) print i}' `
-    echo $num
+    #echo $num
     chosenColsNums+=$num
     chosenColsNums+=','
   done

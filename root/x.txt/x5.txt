@@ -1,3 +1,0 @@
-id,primary,number:name,notprimary,string:age,notprimary,number
-id:name:age
-1:amr:25

@@ -1,0 +1,3 @@
+id,primary,number:name,notprimary,string:age,notprimary,number:profession,notprimary,string
+id:name:age:profession
+1:mahmoud:100:engineer

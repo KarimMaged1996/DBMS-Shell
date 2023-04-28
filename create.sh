@@ -3,7 +3,7 @@
 #check that the filename is valid (txt file)
 function checkname() {
 	
-	if [[ $1 =~ ^[a-zA-Z0-9_]+\.[tT][xX][tT]$ ]]; then
+	if [[ $1 =~ ^[a-zA-Z0-9_]+ ]]; then
 		return 0 
 	else
 		echo "File name is invalid."
