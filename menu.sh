@@ -130,7 +130,7 @@ menuUI() {
         read databaseToDrop
       done
 
-      if [ -d $databaseToDrop ]; then
+      if [ -d $PWD/root/$databaseToDrop ]; then
         dropDatabase $databaseToDrop
       else
         echo "The database you want to delete does't exist Now you are back to the main menu"
